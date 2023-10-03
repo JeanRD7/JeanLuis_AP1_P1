@@ -10,7 +10,7 @@ namespace JeanLuis_AP1_P1.Models
         public int AporteId { get; set; }
 
         [Required (ErrorMessage ="Debe Registrar la fecha de Aporte")]
-        public DateTime Fecha { get; set; } = new DateTime();
+        public DateTime Fecha { get; set; } = DateTime.Now;
         [Required (ErrorMessage ="Debe llenar el campo.")]
         public string? Persona { get; set; }
         [Required (ErrorMessage ="Debe llenar el campo.")]
