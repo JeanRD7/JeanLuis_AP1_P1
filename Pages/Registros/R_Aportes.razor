@@ -1,0 +1,167 @@
+﻿@page "/R_Aportes"
+@page "/R_Aportes/{AporteId:int}"
+@inject AportesBLL AportesBLL
+@inject NotificationService notificationService
+
+<PageTitle>Registro Clientes</PageTitle>
+
+<EditForm Model="Aporte" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="form-control">
+        <div class="text-center">
+            <h3>Registro de Aportes</h3>
+        </div>
+
+        <div class="container overflow-hidden">
+            <form class="row gy-3">
+
+                <div class="col-6">
+                    <div class="col-ms">
+                        <label>AporteId</label>
+                        <div class="input-group mb-3">
+                            <InputNumber @bind-Value="Aporte.AporteId" class="form-control" />
+                            <button type="button" class="btn btn-primary" @onclick="BtnBuscar">
+                                <span class="oi oi-magnifying-glass"></span>
+                            </button>
+                        </div>
+                    </div>           
+
+                    <div class="col-6">
+                        @*Fecha*@
+                        <label>Fecha: </label>
+                        <InputDate @bind-Value="Aporte.Fecha" class="form-control" />
+                        <ValidationMessage For="@(() => Aporte.Fecha)" />
+                    </div>
+
+                    <div class="col-ms">
+                        <label> Persona </label>
+                        <InputText @bind-Value="Aporte.Persona" placeholder="Juan Perez"
+                                   class="form-control" />
+                        <ValidationMessage For="@(() => Aporte.Persona)" />
+                    </div>
+
+                    <div class="col-ms">
+                        <label> Observacion </label>
+                        <InputText @bind-Value="Aporte.Observacion" placeholder="Gracias"
+                                   class="form-control" />
+                        <ValidationMessage For="@(() => Aporte.Observacion)" />
+                    </div>
+
+                    <div class="col-ms">
+                        <label> Monto </label>
+                        <InputNumber @bind-Value="Aporte.Monto" placeholder="818.50"
+                                     class="form-control" />
+                        <ValidationMessage For="@(() => Aporte.Monto)" />
+                    </div>
+
+                </div>
+            </form>
+            <div class="card-footer">
+                <div class="mb-3 text-center" display: inline-block>
+                    <button type="button" class="btn btn-primary"
+                            @onclick="Nuevo">
+                        <i class="oi oi-file" /> Nuevo
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="oi oi-document" /> Guardar
+                    </button>
+                    <button type="button" class="btn btn-danger"
+                            @onclick="Eliminar">
+                        <i class="oi oi-trash" /> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? AporteId { get; set; }
+    public Aportes Aporte = new Aportes();
+
+    public void Nuevo()
+    {
+        Aporte = new Aportes();
+    }
+
+    public void Guardar()
+    {
+        bool guardado = AportesBLL.Guardar(Aporte);
+        if (guardado)
+        {
+            Nuevo();
+            MostrarNotificacionGuardar();
+        }
+        else
+        {
+            MostrarNotificacionError();
+        }
+
+    }
+
+    public void Eliminar()
+    {
+        BtnBuscar();
+        if (AportesBLL.Eliminar(this.Aporte.AporteId))
+        {
+            MostrarNotificacionEliminar();
+            Nuevo();
+        }
+        else
+        {
+            MostrarNotificacionError();
+        }
+
+    }
+
+    public void BtnBuscar()
+    {
+        var ClienteEncontrado = AportesBLL.Buscar(Aporte.AporteId);
+        if (ClienteEncontrado != null)
+        {
+            Aporte = ClienteEncontrado;
+        }
+    }
+
+    public void MostrarNotificacionGuardar()
+    {
+        var mensaje = new NotificationMessage
+        {
+            Severity = NotificationSeverity.Success,
+            Summary = "Notificacion",
+            Detail = "Registro Guardado Correctamente",
+            Duration = 4_000
+        };
+
+        notificationService.Notify(mensaje);
+    }
+
+    public void MostrarNotificacionError()
+    {
+        var mensaje = new NotificationMessage
+        {
+            Severity = NotificationSeverity.Error,
+            Summary = "Notificacion",
+            Detail = "Ha ocurrido un error, No se pudo completar la acción",
+            Duration = 4_000
+        };
+
+        notificationService.Notify(mensaje);
+    }
+
+    public void MostrarNotificacionEliminar()
+    {
+        var mensaje = new NotificationMessage
+        {
+            Severity = NotificationSeverity.Success,
+            Summary = "Notificacion",
+            Detail = "Registro Eliminado Correctamente",
+            Duration = 4_000
+        };
+
+        notificationService.Notify(mensaje);
+    }
+}
+

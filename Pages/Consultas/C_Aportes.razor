@@ -1,0 +1,116 @@
+﻿@page "/C_Aportes"
+@inject AportesBLL AportesBLL
+@inject NotificationService notificationService
+
+<EditForm Model="this">
+    <div class="form-control">
+        <div class="text-center">
+            <h4>Consulta de Aportes</h4>
+        </div>
+
+        <div class="form-control">
+            <div class="card-body">
+                <form>
+                    <div class="row">
+                        <div class="col">
+                            <label>Buscar Por:</label>
+                            <select class="form-control" @bind="Filtro">
+
+                                <option value="0">Lista Completa</option>
+                                <option value="1">Persona</option>
+                                @*<option value="2">Nombre Cliente</option>
+                                <option value="3">Rnc Cliente</option>*@
+
+                            </select>
+                        </div>
+                        <div class="col">
+                            <div class="input-group d-flex align-items-end">
+                                <label>Buscar</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" @bind="Criterio" />
+                                    <button type="button" class="btn btn-info" @onclick="Buscar">
+                                        <i class="oi oi-magnifying-glass" /> Buscar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <table class="table table-striped table-hover mt-4 table-striped" style="cursor: pointer;">
+                    <thead class="thead-green">
+                        <tr class="table-info">
+                            <th>AporteId</th>
+                            <th>Fecha</th>
+                            <th>Persona</th>
+                            <th>Observación</th>
+                            <th>Monto</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in lista)
+                        {
+                            <tr>
+                                <td>@item.AporteId</td>
+                                <td>@item.Fecha</td>
+                                <td>@item.Persona</td>
+                                <td>@item.Observacion</td>
+                                <td>@item.Monto</td>
+                                <td><a class="btn btn-outline-primary" href="/R_Aportes/@item.AporteId">Ver</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    public Aportes Aporte { get; set; } = new Aportes();
+    public List<Aportes> lista { get; set; } = new List<Aportes>();
+    public string? Filtro { get; set; }
+    public string? Criterio { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    public void Buscar()
+    {
+        MostrarNotificacionBuscar();
+
+        if (Criterio != null)
+        {          
+            switch (Filtro)
+            {
+                case "0":                    
+                    lista = AportesBLL.GetList(op => true);                   
+                    break;
+
+                case "1":
+                    lista = AportesBLL.GetList(op => op.Persona.ToLower().Contains(Criterio.ToLower()));                   
+                    break;
+            }
+        }
+        else
+        {
+            lista = AportesBLL.GetList(op => true);
+        }
+    }
+
+    public void MostrarNotificacionBuscar()
+    {
+        var mensaje = new NotificationMessage
+        {
+            Severity = NotificationSeverity.Success,
+            Summary = "Notificacion",
+            Detail = "Registros Encontrados",
+            Duration = 4_000
+        };
+
+        notificationService.Notify(mensaje);
+    }
+}
