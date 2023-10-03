@@ -47,9 +47,9 @@ namespace JeanLuis_AP1_P1.BLL
 
         public bool Eliminar(int AporteId)
         {
-            var eliminado = _context.Aportes.Where(op => op.AporteId == AporteId).SingleOrDefault();
+            var eliminado = _context.Aportes.Where(o => o.AporteId == AporteId).SingleOrDefault();
 
-            if(eliminado != null)
+            if (eliminado != null)
             {
                 _context.Entry(eliminado).State = EntityState.Deleted;
                 return _context.SaveChanges() > 0;
